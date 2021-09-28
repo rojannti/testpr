@@ -1,0 +1,23 @@
+
+# Ensures you do not inherit an AzContext in your runbook
+	$connectionName = "AzureRunAsConnection"
+
+		$servicePrincipalConnection = Get-AutomationConnection -Name $connectionName         
+
+		Write-Verbose "Logging in to Azure..." -Verbose
+
+		Add-AzureRmAccount `
+			-ServicePrincipal `
+			-TenantId $servicePrincipalConnection.TenantId `
+			-ApplicationId $servicePrincipalConnection.ApplicationId `
+			-CertificateThumbprint $servicePrincipalConnection.CertificateThumbprint | Out-Null
+
+        $VMs = Get-AzureRmVM
+
+		Foreach ($VM in $VMs) {
+
+		Get-AzureRmRecoveryServicesBackupStatus -Type AzureVM -Name $VM.Name -ResourceGroupName $VM.ResourceGroupName
+
+		}
+
+

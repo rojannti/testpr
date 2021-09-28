@@ -1,0 +1,29 @@
+
+# Ensures you do not inherit an AzContext in your runbook
+param (
+    [Parameter(Mandatory=$false)] 
+    [String] $NSGName,
+    [Parameter(Mandatory=$false)]
+    [String] $RGName,
+    [Parameter(Mandatory=$false)]
+    [String] $RuleName,
+    [Parameter(Mandatory=$false)]
+    [object] $WebhookData
+)
+    $connectionName = "AzureRunAsConnection"
+
+		$servicePrincipalConnection = Get-AutomationConnection -Name $connectionName         
+
+		Write-Verbose "Logging in to Azure..." -Verbose
+
+		Add-AzureRmAccount `
+			-ServicePrincipal `
+			-TenantId $servicePrincipalConnection.TenantId `
+			-ApplicationId $servicePrincipalConnection.ApplicationId `
+			-CertificateThumbprint $servicePrincipalConnection.CertificateThumbprint | Out-Null
+
+$Nsg = Get-AzureRmNetworkSecurityGroup -Name $NSGName -ResourceGroupName $RGName 
+$NsgRule = Get-AzureRmNetworkSecurityGroup -Name $NSGName -ResourceGroupName $RGName | Get-AzureRmNetworkSecurityRuleConfig -Name $RuleName
+Remove-AzureRmNetworkSecurityRuleConfig -Name $RuleName -NetworkSecurityGroup $Nsg
+
+Add-AzureRmNetworkSecurityRuleConfig -Name $RuleName -Description $NsgRule.Name -Access Deny -Protocol Tcp -Direction Inbound -Priority $NsgRule.Priority -SourceAddressPrefix Internet -SourcePortRange * -DestinationAddressPrefix * -DestinationPortRange 3389 | Set-AzureRmNetworkSecurityGroup

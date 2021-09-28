@@ -19,7 +19,8 @@ Connect-AzAccount -ServicePrincipal -Tenant $Conn.TenantID -ApplicationId $Conn.
 $srcapp = Get-AzWebApp -ResourceGroupName $Body.RgName -Name $Body.WebAppName
 $destapp = New-AzWebApp -ResourceGroupName $Body.RgName -Name $Body.NewWebAppName -Location $srcapp.Location -AppServicePlan $Body.ASPName -SourceWebApp $srcapp
 
-Write-Output "WebApp $WebAppName Cloned Successfully" 
+Write-Output "WebApp $WebAppName Cloned Successf
+# added some comments
 
 
 

@@ -8,7 +8,7 @@ param (
     [Parameter(Mandatory=$false)]
     [object] $WebhookData
 )
-# Ensures you do not inherit an AzContext in your runbook
+
 Disable-AzContextAutosave -Scope Process
 $Body = ConvertFrom-Json -InputObject $WebhookData.RequestBody
 $Conn = Get-AutomationConnection -Name AzureRunAsConnection
@@ -18,3 +18,5 @@ Set-AzCurrentStorageAccount -ResourceGroupName $Body.RgName -AccountName $Body.S
 New-AzStorageContainer -Name $Body.ContainerName
 
 Write-Output "Container Created Successfully" 
+
+# some changes has been performed 
